@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'register_screen.dart';
 import 'login_screen.dart';
 
 void main() async {
@@ -9,7 +8,7 @@ void main() async {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     theme: ThemeData(primarySwatch: Colors.blue),
-    home: LoginScreen(), // Bắt đầu bằng Login
+    home: LoginScreen(),
   ));
 }
 
@@ -21,10 +20,10 @@ class MyApp extends StatelessWidget {
     return 
     MaterialApp(
       theme: ThemeData(
-        useMaterial3: true, // Bật Material 3 để có UI mới nhất
+        useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
           seedColor: Colors.blueAccent,
-          brightness: Brightness.dark, // Chuyển sang Dark Mode
+          brightness: Brightness.dark,
         ),
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
