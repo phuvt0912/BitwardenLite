@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'session.dart';
+import '../session.dart';
 import 'vault_screen.dart';
 import 'register_screen.dart';
 

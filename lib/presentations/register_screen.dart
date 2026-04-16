@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'session.dart';
+import '../session.dart';
 import 'vault_screen.dart';
 import 'login_screen.dart';
-import 'encryption_helper.dart';
+import '../helper/encryption_helper.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override

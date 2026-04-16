@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
-import 'encryption_helper.dart';
-import 'session.dart';
+import '../helper/encryption_helper.dart';
+import '../session.dart';
 import 'generator_screen.dart';
 import 'account_screen.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'encryption_helper.dart';
+import '../helper/encryption_helper.dart';
 
 class GeneratorContent extends StatefulWidget {
   @override

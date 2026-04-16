@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'session.dart';
-import 'encryption_helper.dart';
+import '../session.dart';
+import '../helper/encryption_helper.dart';
 import 'login_screen.dart';
 
 class AccountContent extends StatefulWidget {
@@ -103,7 +103,6 @@ class _AccountContentState extends State<AccountContent> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Đã cập nhật toàn bộ dữ liệu với mật khẩu mới!")));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
-      print("Error during re-encryption: $e");
     } finally {
       setState(() => _isUpdating = false);
     }
