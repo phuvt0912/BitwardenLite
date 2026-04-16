@@ -21,11 +21,11 @@ class _LoginScreenState extends State<LoginScreen> {
       );
       Session.masterPassword = _passwordController.text.trim();
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VaultScreen()));
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Đăng nhập thất bại!")));
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

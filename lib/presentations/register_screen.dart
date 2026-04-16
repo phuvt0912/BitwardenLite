@@ -47,8 +47,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   email: _emailController.text.trim(),
                   password: _passwordController.text.trim(),
                 );
-                Session.masterPassword = _passwordController.text.trim();
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VaultScreen()));
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Đăng ký thành công!")));
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
               }

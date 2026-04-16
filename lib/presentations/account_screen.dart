@@ -20,12 +20,17 @@ class _AccountContentState extends State<AccountContent> {
         context, MaterialPageRoute(builder: (context) => LoginScreen()), (r) => false);
   }
 
-  void _showChangeMasterPasswordDialog() {
+  void _showChangeMasterPasswordDialog() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: Không tìm thấy người dùng!")));
+      return;
+    }
     final oldC = TextEditingController();
     final newC = TextEditingController();
     final confirmC = TextEditingController();
 
-    showDialog(
+    showDialog( 
       context: context,
       builder: (context) => AlertDialog(
         title: Text("Đổi mật khẩu Master"),
@@ -63,7 +68,6 @@ class _AccountContentState extends State<AccountContent> {
     );
   }
 
-  /// Hàm quan trọng: Giải mã toàn bộ bằng Master Password cũ và mã hóa lại bằng Master Password mới
   Future<void> _updateAllPasswords(String newMaster) async {
     setState(() => _isUpdating = true);
     try {
@@ -71,35 +75,28 @@ class _AccountContentState extends State<AccountContent> {
       final collection = FirebaseFirestore.instance.collection('users').doc(uid).collection('passwords');
       final snapshot = await collection.get();
 
-      // Sử dụng WriteBatch để cập nhật nhiều tài liệu cùng lúc một cách hiệu quả
+      final String? oldMaster = Session.masterPassword;
+      await FirebaseAuth.instance.currentUser!.updatePassword(newMaster);
+      Session.masterPassword = newMaster;
+
       WriteBatch batch = FirebaseFirestore.instance.batch();
-      
+
       for (var doc in snapshot.docs) {
-        // 1. Giải mã mật khẩu cũ (Sử dụng hàm decrypt mới nhận IV từ Firestore)
         String decrypted = EncryptionHelper.decryptPassword(
           doc['password'], 
           doc['iv'], 
-          Session.masterPassword!
+          oldMaster!
         );
 
-        // 2. Mã hóa lại với Master Password mới (Hàm này tự tạo IV ngẫu nhiên mới)
-        Map<String, String> reEncryptedData = EncryptionHelper.encryptPassword(decrypted, newMaster);
+        Map<String, String> reEncryptedData = EncryptionHelper.encryptPassword(decrypted, Session.masterPassword!);
         
-        // 3. Cập nhật đồng thời cả password mới và iv mới vào batch
         batch.update(doc.reference, {
           'password': reEncryptedData['pw'],
           'iv': reEncryptedData['iv'],
           'updatedAt': Timestamp.now(),
         });
       }
-
-      await batch.commit(); // Gửi toàn bộ thay đổi lên Firebase
-      
-      // Quan trọng: Cập nhật đồng bộ cả mật khẩu đăng nhập của Firebase Authentication
-      await FirebaseAuth.instance.currentUser!.updatePassword(newMaster);
-
-      Session.masterPassword = newMaster; // Cập nhật Session để ứng dụng tiếp tục hoạt động
-
+      await batch.commit(); 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Đã cập nhật toàn bộ dữ liệu với mật khẩu mới!")));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
