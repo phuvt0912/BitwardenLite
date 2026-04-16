@@ -81,7 +81,6 @@ class _AccountContentState extends State<AccountContent> {
     );
   }
 
-  /// Hàm quan trọng: Giải mã toàn bộ bằng Master Password cũ và mã hóa lại bằng Master Password mới
   Future<void> _updateAllPasswords(String newMaster) async {
     setState(() => _isUpdating = true);
     try {
@@ -89,16 +88,20 @@ class _AccountContentState extends State<AccountContent> {
       final collection = FirebaseFirestore.instance.collection('users').doc(uid).collection('passwords');
       final snapshot = await collection.get();
 
+      final String? oldMaster = Session.masterPassword;
+      await FirebaseAuth.instance.currentUser!.updatePassword(newMaster);
+      Session.masterPassword = newMaster;
+
       WriteBatch batch = FirebaseFirestore.instance.batch();
-      
+
       for (var doc in snapshot.docs) {
         String decrypted = EncryptionHelper.decryptPassword(
           doc['password'], 
           doc['iv'], 
-          Session.masterPassword!
+          oldMaster!
         );
 
-        Map<String, String> reEncryptedData = EncryptionHelper.encryptPassword(decrypted, newMaster);
+        Map<String, String> reEncryptedData = EncryptionHelper.encryptPassword(decrypted, Session.masterPassword!);
         
         batch.update(doc.reference, {
           'password': reEncryptedData['pw'],
@@ -106,11 +109,7 @@ class _AccountContentState extends State<AccountContent> {
           'updatedAt': Timestamp.now(),
         });
       }
-
       await batch.commit(); 
-      await FirebaseAuth.instance.currentUser!.updatePassword(newMaster);
-      Session.masterPassword = newMaster;
-
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Đã cập nhật toàn bộ dữ liệu với mật khẩu mới!")));
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
