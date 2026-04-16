@@ -19,6 +19,12 @@ class _LoginScreenState extends State<LoginScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      User? user =  await FirebaseAuth.instance.currentUser;
+      if(user != null && !user.emailVerified) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vui lòng xác nhận email trước khi đăng nhập!")));
+        await FirebaseAuth.instance.signOut();
+        return;
+      }
       Session.masterPassword = _passwordController.text.trim();
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VaultScreen()));
     } catch (e) {

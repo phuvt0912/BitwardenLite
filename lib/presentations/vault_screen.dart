@@ -218,8 +218,6 @@ class _VaultContentState extends State<VaultContent> {
               ElevatedButton(
                 onPressed: () async {
                   if (sC.text.isEmpty || pC.text.isEmpty) return;
-
-                  // MÃ HÓA MỚI VỚI IV NGẪU NHIÊN
                   final encryptedData = EncryptionHelper.encryptPassword(
                     pC.text.trim(), 
                     Session.masterPassword ?? ""
