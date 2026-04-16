@@ -9,17 +9,17 @@ class EncryptionHelper {
 
 //Tạo khóa từ masterpassword
   static encrypt.Key _deriveKey(String masterPassword) {
-    var bytes = utf8.encode(masterPassword);
-    print("Bước 1 lấy khóa");
-    var digest = sha256.convert(bytes);
-    print("Bước 2: Khóa đã được băm bằng SHA-256.");
-    return encrypt.Key(Uint8List.fromList(digest.bytes));
+    var bytes = utf8.encode(masterPassword); //Chuyển thành dạng bytes
+    var digest = sha256.convert(bytes); //Băm mã bytes trên thành 32 bytes để làm khóa
+    return encrypt.Key(Uint8List.fromList(digest.bytes)); //Đổi thành dạng Key của thư viện để tiện cho việc mã hóa và giải mã
   }
+
+  //Hàm mã hóa
 static Map<String, String> encryptPassword(String plainText, String masterPassword) {
     if (masterPassword.isEmpty) return {'pw': plainText, 'iv': ''};
     
     final key = _deriveKey(masterPassword);
-    final iv = encrypt.IV.fromLength(16); // Tạo IV ngẫu nhiên mỗi lần gọi
+    final iv = encrypt.IV.fromLength(16);
     final encrypter = encrypt.Encrypter(encrypt.AES(key));
     
     final encrypted = encrypter.encrypt(plainText, iv: iv);
@@ -30,6 +30,7 @@ static Map<String, String> encryptPassword(String plainText, String masterPasswo
     };
   }
 
+//Hàm giải mã
   static String decryptPassword(String encryptedBase64, String ivBase64, String masterPassword) {
     if (masterPassword.isEmpty) return "No Key";
     if (ivBase64.isEmpty) return "No IV";
@@ -37,9 +38,9 @@ static Map<String, String> encryptPassword(String plainText, String masterPasswo
     try {
       final key = _deriveKey(masterPassword);
       final iv = encrypt.IV.fromBase64(ivBase64);
-      final encrypter = encrypt.Encrypter(encrypt.AES(key));
+      final encrypter = encrypt.Encrypter(encrypt.AES(key)); //Tạo đối tượng encrypter với thuật toán AES với khóa đã tạo ở trên (Advanced Encryption Standard)
       
-      return encrypter.decrypt64(encryptedBase64, iv: iv);
+      return encrypter.decrypt64(encryptedBase64, iv: iv); // Giải mã đối tượng encrypter trên với chuỗi bị mã hóa và IV bị mã hóa được truyền vào. Kết quả trả về là chuỗi gốc chính là mật khẩu 
     } catch (e) {
       return "Lỗi giải mã";
     }

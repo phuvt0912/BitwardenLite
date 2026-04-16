@@ -13,7 +13,7 @@ class VaultScreen extends StatefulWidget {
 }
 
 class _VaultScreenState extends State<VaultScreen> {
-  int _selectedIndex = 2; // Mặc định mở Két sắt
+  int _selectedIndex = 2;
 
   final List<Widget> _pages = [
     AccountContent(),   
@@ -113,7 +113,6 @@ class _VaultContentState extends State<VaultContent> {
                       IconButton(
                         icon: Icon(Icons.copy, size: 20), 
                         onPressed: () {
-                          // GIẢI MÃ VỚI IV TỪ FIRESTORE
                           String p = EncryptionHelper.decryptPassword(
                             doc['password'], 
                             doc['iv'], 
@@ -165,7 +164,6 @@ class _VaultContentState extends State<VaultContent> {
     final sC = TextEditingController(text: doc != null ? doc['serviceName'] : "");
     final uC = TextEditingController(text: doc != null ? doc['username'] : "");
     
-    // GIẢI MÃ DỮ LIỆU CŨ ĐỂ HIỂN THỊ TRONG FORM
     String initialPass = "";
     if (doc != null) {
       initialPass = EncryptionHelper.decryptPassword(
@@ -230,8 +228,8 @@ class _VaultContentState extends State<VaultContent> {
                   var data = {
                     'serviceName': sC.text.trim(), 
                     'username': uC.text.trim(), 
-                    'password': encryptedData['pw'], // Lưu Ciphertext
-                    'iv': encryptedData['iv'],       // LƯU IV ĐI KÈM
+                    'password': encryptedData['pw'],
+                    'iv': encryptedData['iv'],      
                     'updatedAt': Timestamp.now(),
                   };
 
