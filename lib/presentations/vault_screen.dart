@@ -110,6 +110,13 @@ class _VaultContentState extends State<VaultContent> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                        IconButton(
+                        icon: Icon(Icons.person, size: 20), 
+                        onPressed: () {
+                          String username = doc['username'];
+                          _copy(context, username, "Đã copy Tên đăng nhập");
+                        }
+                      ),
                       IconButton(
                         icon: Icon(Icons.copy, size: 20), 
                         onPressed: () {
