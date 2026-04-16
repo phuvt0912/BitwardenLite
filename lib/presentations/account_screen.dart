@@ -20,7 +20,25 @@ class _AccountContentState extends State<AccountContent> {
         context, MaterialPageRoute(builder: (context) => LoginScreen()), (r) => false);
   }
 
-  void _showChangeMasterPasswordDialog() {
+  void _showChangeMasterPasswordDialog() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: Không tìm thấy người dùng!")));
+      return;
+    }
+    else{
+      try {
+        if(!user.emailVerified) {
+          await user.sendEmailVerification();
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vui lòng xác nhận email trước khi đổi mật khẩu!")));
+          return;
+        }
+      }
+      catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
+        return;
+      }
+    } 
     final oldC = TextEditingController();
     final newC = TextEditingController();
     final confirmC = TextEditingController();
@@ -41,24 +59,6 @@ class _AccountContentState extends State<AccountContent> {
           TextButton(onPressed: () => Navigator.pop(context), child: Text("Hủy")),
           ElevatedButton(
             onPressed: () async {
-              User? user = FirebaseAuth.instance.currentUser;
-              if (user == null) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: Không tìm thấy người dùng!")));
-                return;
-              }
-              else{
-                try {
-                  await user.sendEmailVerification();
-                  if(!user.emailVerified) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vui lòng xác nhận email trước khi đổi mật khẩu!")));
-                    return;
-                  }
-                }
-                catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
-                  return;
-                }
-              } 
               if (oldC.text != Session.masterPassword) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Mật khẩu cũ không đúng!")));
                 return;
