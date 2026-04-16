@@ -43,20 +43,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
           SizedBox(width: double.infinity, height: 50, child: ElevatedButton(
             onPressed: () async {
               try {
-                
-                await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
                   email: _emailController.text.trim(),
                   password: _passwordController.text.trim(),
                 );
-                User? user =  await FirebaseAuth.instance.currentUser;
-                if(user != null) {
+
+                User? user = userCredential.user;
+
+                if (user != null) {
                   await user.sendEmailVerification();
-                  if(user.emailVerified) {
-                    Session.masterPassword = _passwordController.text.trim();
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VaultScreen()));
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Đăng ký thành công!")));
-                  }
-                  else {ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vui lòng xác nhận email trước khi đăng nhập!")));}
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Đăng ký thành công! Vui lòng kiểm tra email để xác thực."),
+                      duration: Duration(seconds: 5),
+                    ),
+                  );
+                  await FirebaseAuth.instance.signOut();
+                  Navigator.pushReplacement(
+                    context, 
+                    MaterialPageRoute(builder: (context) => LoginScreen())
+                  );
                 }
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Lỗi: $e")));

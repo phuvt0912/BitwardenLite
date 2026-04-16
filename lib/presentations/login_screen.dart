@@ -15,23 +15,38 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _handleLogin() async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      User? user =  await FirebaseAuth.instance.currentUser;
-      if(user != null && !user.emailVerified) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Vui lòng xác nhận email trước khi đăng nhập!")));
-        await FirebaseAuth.instance.signOut();
-        return;
+
+      User? user = userCredential.user;
+
+      if (user != null) {
+        await user.reload();
+        user = FirebaseAuth.instance.currentUser;
+
+        if (!user!.emailVerified) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text("Vui lòng xác nhận email trước khi đăng nhập!"),
+              action: SnackBarAction(
+                label: "Gửi lại",
+                onPressed: () => user?.sendEmailVerification(),
+              ),
+            )
+          );
+          await FirebaseAuth.instance.signOut();
+          return;
+        }
       }
       Session.masterPassword = _passwordController.text.trim();
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => VaultScreen()));
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Đăng nhập thất bại!")));
     }
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
